@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ajax Demo</title>
+
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- <h1>Register</h1>
+    <form action="/register" method="post">
+        {% csrf_token %}
+        <input type="text" name="first" placeholder="First Name"><br>
+        <input type="text" name="last" placeholder="Last Name"><br>
+        <input type="text" name="email" placeholder="Email"><br>
+        <input type="age" name="age"> = Age<br>
+        <input type="submit" value="Register"><br>
+    </form><br>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        {% csrf_token %}
+        <input type="text" name="email" placeholder="Email"><br>
+        <input type="submit" value="Login"><br>
+    </form><br>
+    <a href="/clear">Logout</a> -->
+
+    <h1>Demo 1</h1>
+    <button class="btn btn-primary" id='button_json'>Fetch HttpResponse from user_login/all.json</button>
+    <button class="btn btn-primary" id='button_html'>Fetch HttpResponse from user_login/all.html</button>
+
+    <div style="margin-top:50px; border: 1px solid silver; padding: 10px; width: 700px;" id='placeholder1'> Placeholder for Ajax content</div>
+
+    <script>
+        $('#button_json').click(function(){
+            console.log('button_json is clicked!');
+            $.ajax({
+                url: '/all.json',
+                success: function(serverResponse) {
+                    console.log('success. serverResponse: ', serverResponse)
+                    $('#placeholder1').html(JSON.stringify(serverResponse))
+                }
+            })
+        });
+
+        $('#button_html').click(function() {
+            console.log('button_html is clicked!');
+            $.ajax({
+                url: '/all.html',
+                success: function(serverResponse) {
+                    console.log('success. serverResponse: ', serverResponse)
+                    $('#placeholder1').html(serverResponse)
+                }
+            })
+        });
+    </script>
+    
+    <h1>Demo 2 - Ajax Form</h1>
+    <form action="/user_login/find" method="post">
+        {% csrf_token %}
+        Find all users whose first name starts with
+        <input type="text" name="first_name_starts_with" id="ajax_first_name"/>
+    </form>
+
+    <div style="margin-top:50px; border: 1px solid silver; padding: 10px; width: 700px;" id='placeholder2'>Placeholder2</div>
+
+    <script>
+        $('#ajax_first_name').keyup(function(){
+            console.log('works bro')
+            console.log("parent's serialize() returned",
+            $(this).parent().serialize())
+            $.ajax({
+                url: '/find',
+                method: 'post',
+                data:$(this).parent().serialize(),
+                success: function(serverResponse){
+                    console.log('success', serverResponse)
+                    $('#placeholder2').html(serverResponse)
+                }
+            })
+        });
+    </script>
+
+<h1>Demo 3 - Ajax Form II</h1>
+    <form action="/create" method="post" 
+        class="ajax_form" id="create_user_ajax_form">
+        {% csrf_token %}
+        Create User
+        First Name: <input type="text" name="first" />
+        Last Name: <input type="text" name="last" />
+        Email: <input type="text" name="email" />
+        Age: <input type="number" name="age">
+        <input type="submit" value="Submit"/>
+    </form>
+
+    <div style="margin-top:50px; border: 1px solid silver; padding: 10px; width: 700px;" id='placeholder3'>Placeholder3</div>
+
+    <script>
+       $('#create_user_ajax_form').submit(function(e){
+        e.preventDefault()
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'post',
+            data:$(this).serialize(),
+            success: function(serverResponse){
+                console.log('success', serverResponse)
+                $('#placeholder3').html(serverResponse)
+            }
+        })
+       })
+    </script>
+
+<h1>Even more Ajax Orm Magic!</h1>
+    <form action="/user_login/findLastName" method="post">
+        {% csrf_token %}
+        Find all users whose last name starts with
+        <input type="text" name="last_name_starts_with" id="ajax_last_name"/>
+    </form>
+
+    <script>
+        $('#ajax_last_name').keyup(function(){
+            console.log('works bro')
+            console.log("parent's serialize() returned",
+            $(this).parent().serialize())
+            $.ajax({
+                url: '/findLastName',
+                method: 'post',
+                data:$(this).parent().serialize(),
+                success: function(serverResponse){
+                    console.log('success', serverResponse)
+                    $('#placeholder4').html(serverResponse)
+                }
+            })
+        });
+    </script>
+
+    <form action="monthFilter" method="post">
+        {% csrf_token %}
+        Users who registered in a particular month (enter two-digits representing months ie. Jan = 01 etc...)
+        <input type="int" name="monthFilter" id="ajax_month_filter"/>
+    </form><br>
+
+    <script>
+        $('#ajax_month_filter').keyup(function(){
+            console.log('works bro')
+            console.log("parent's serialize() returned",
+            $(this).parent().serialize())
+            $.ajax({
+                url: '/monthFilter',
+                method: 'post',
+                data:$(this).parent().serialize(),
+                success: function(serverResponse){
+                    console.log('success', serverResponse)
+                    $('#placeholder4').html(serverResponse)
+                }
+            })
+        });
+    </script>
+
+    <button class="btn btn-primary" id='button_lastNameOrder'>List Users by Last Name alphabetically</button><br><br>
+    <button class="btn btn-primary" id='button_firstToRegister'>List Users by those who registered first</button><br>
+
+    <script>
+  
+        $('#button_lastNameOrder').click(function() {
+            $.ajax({
+                url: '/lastNameOrder',
+                success: function(serverResponse) {
+                    console.log('success. serverResponse: ', serverResponse)
+                    $('#placeholder4').html(serverResponse)
+                }
+            })
+        });
+
+        $('#button_firstToRegister').click(function() {
+            $.ajax({
+                url: '/firstToRegister',
+                success: function(serverResponse) {
+                    // console.log('success. serverResponse: ', serverResponse)
+                    $('#placeholder4').html(serverResponse)
+                }
+            })
+        });
+    </script>
+    <br>
+    <form action="/dateRange" method="post" 
+            class="ajax_form" id="date_range_form">
+            {% csrf_token %}
+            Beginning Date: <input type="date" name="beginning" value="2018-01-01"/>
+            End Date: <input type="date" name="end" value="2018-07-07"/>
+            <input type="submit" value="Submit"/>
+    </form>
+
+    <script>
+       $('#date_range_form').submit(function(e){
+        e.preventDefault()
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'post',
+            data:$(this).serialize(),
+            success: function(serverResponse){
+                console.log('success', serverResponse)
+                $('#placeholder4').html(serverResponse)
+            }
+        })
+       })
+    </script>
+    
+
+    <div style="margin-top:50px; border: 1px solid silver; padding: 10px; width: 700px;" id='placeholder4'>Placeholder4</div>
+
+</body>
+</html>
